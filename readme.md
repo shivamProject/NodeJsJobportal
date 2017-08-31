@@ -4,3 +4,5 @@
 2. Create table - users
 3. Fields - id(varchar,20), email(varchar,100), password(varchar,100)
 4. run npm install at root of folder
+5. For Webstorme configuration, Go to setting>VersionControl>Path to Git Executable->C:\Program Files\Git\bin\git.exe
+
