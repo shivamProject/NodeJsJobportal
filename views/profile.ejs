@@ -1,0 +1,25 @@
+<% include partials/head %>
+
+  <body>
+    <div class="col-sm-8 col-sm-offset-2">
+      <div class="text-center">
+        <h1 class=" fa fa-user"> Profile</h1><br>
+        <span class="fa fa-sign-out"><a href="/"> Sign out</a></span>
+        <hr>
+        <div class="jumbotron">
+          <% if (user.email != null) { %>
+            <img src="https://avatars.io/gravatar/<%= user.email %>" class="img-circle"><br>
+            <strong>email</strong>: <%= user.email %><br>
+          <% } %>
+        </div>
+        <div style="border: 2px solid">
+          <form action="/uploadFile" enctype="multipart/form-data" method="post">
+            File <input type="file" name="imgUploader" accept="image/*">
+            <input type="submit" value="Upload">
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
