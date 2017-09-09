@@ -1,0 +1,28 @@
+<% include partials/head %>
+
+  <body>
+    <div class="col-sm-8 col-sm-offset-2">
+      <div class="text-center">
+        <h1 class=" fa fa-user"> Google Profile</h1><br>
+        <span class="fa fa-sign-out"><a href="/"> Sign out</a></span>
+        <hr>
+        <div class="jumbotron">
+          <% if (user.emails[0] != null) { %>
+            <img src="https://avatars.io/gravatar/<%= user.emails %>" class="img-circle"><br>
+            <strong>email</strong>: <%= user.emails[0].value %><br>
+          <p>Name: <%= user.displayName %></p>
+          <p>Email: <%= user.emails[0].value %></p>
+          <p><img src="<%= user.photos[0].value %>" alt="Photo of <%= user.displayName %>."></p>
+          <% } %>
+        </div>
+        <div style="border: 2px solid">
+          <form action="/uploadFile" enctype="multipart/form-data" method="post">
+            File <input type="file" name="imgUploader" accept="image/*">
+            <input type="submit" value="Upload">
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

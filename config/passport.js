@@ -1,4 +1,9 @@
 var LocalStrategy = require('passport-local').Strategy;
+var LocalFormStrategy = require('passport-local-forms').Strategy;
+var forms = require('forms'),fields = forms.fields;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var fbStrategy = require('passport-facebook').Strategy;
+var authConfig = require('../config/googleauth.json');
 // var User = require('../models/user');
 var mysql = require('mysql');
 
@@ -11,21 +16,45 @@ var connection = mysql.createConnection({
 //connection.query('use auth');
 connection.query('use authapi');
 
+var loginForm = forms.create({
+	username: fields.string({ required: true })
+	, password: fields.password({ required: true })
+});
+
+
 module.exports = function(passport){
 	passport.serializeUser(function(user, done){
-		console.log('serializeUser: ' + user.email)
-		done(null, user.email);
+
+		if(user.provider=='facebook' || user.provider=='google'){
+			done(null, user);
+		}else{
+			done(null, user);
+		}
+		//console.log('serializeUser: ' + user.email);
+		//console.log('serializeUser: ' + user.emails[0].value);
+
+		//done(null, user);
 	});
 
-	passport.deserializeUser(function(email, done){
+	passport.deserializeUser(function(user, done){
+		if(user.provider=='facebook' || user.provider=='google'){
+			done(null, user);
+		}else{
+			//done(null, user.email);
+			var email1=user.email;
+			connection.query("select * from users where email = ? ",[email1], function(err, results, fields){
+			 done(err, results[0]);
+			 });
+		}
 		// User.findById(id, function(err, user){
 		// 	done(err, user);
 		// });
-		connection.query("select * from users where email = ? ",[email], function(err, results, fields){
+		//Mysql Use
+		/*connection.query("select * from users where email = ? ",[email], function(err, results, fields){
 			done(err, results[0]);
-		});
+		});*/
 
-		// done(null, '12345');
+		 //done(null, email);
 	});
 
 	passport.use('local-signup', new LocalStrategy({
@@ -101,4 +130,73 @@ module.exports = function(passport){
 			return done(null, rows[0]);
 		});
 	}));
+
+	passport.use('local-form-login',new LocalFormStrategy({
+			usernameField:'userid',
+			passwordField:'password',
+			form: loginForm
+			, formError: function(err, req, form) {
+				req.res.render('login', { loginForm: form, user: req.user, message: err.message });
+			}
+		}
+		, function(form,req, userid, password, done) {
+			// asynchronous verification, for effect...
+			process.nextTick(function () {
+
+				// Find the user by username.  If there is no user with the given
+				// username, or the password is not correct, set the user to `false` to
+				// indicate failure and set a flash message.  Otherwise, return the
+				// authenticated `user`.
+				connection.query("select * from users where email = '"+userid+"'", function(err, rows){
+					if(err)
+						return done(err);
+					if(!rows.length){
+						return done(null, false, req.flash('loginMessage','No user found'));
+					}
+					if(!(rows[0].password == password)){
+						return done(null, false, req.flash('loginMessage','Worng password'));
+					}
+					console.log('The usename---->'+form.data.username);
+					return done(null, rows[0]);
+				});
+				/*findByUsername(form.data.username, function(err, user) {
+					if (err) { return done(err); }
+					if (!user) { return done(null, false, { message: 'Unknown user ' + form.data.username }); }
+					if (user.password != form.data.password) { return done(null, false, { message: 'Invalid password' }); }
+					return done(null, user);
+				});*/
+			});
+		}
+	));
+
+// Use the GoogleStrategy within Passport.
+//   Strategies in Passport require a `verify` function, which accept
+//   credentials (in this case, an accessToken, refreshToken, and Google
+//   profile), and invoke a callback with a user object.
+//   See http://passportjs.org/docs/configure#verify-callback
+	passport.use('googleauthStretagy',new GoogleStrategy(
+		// Use the API access settings stored in ./config/auth.json. You must create
+		// an OAuth 2 client ID and secret at: https://console.developers.google.com
+		authConfig.google,
+
+		function(accessToken, refreshToken, profile, done) {
+			// Typically you would query the database to find the user record
+			// associated with this Google profile, then pass that object to the `done`
+			// callback.
+			return done(null, profile);
+		}
+	));
+
+	passport.use('fbauthStretagy',new fbStrategy(
+		// Use the API access settings stored in ./config/auth.json. You must create
+		// an OAuth 2 client ID and secret at: https://console.developers.google.com
+		authConfig.facebook,
+
+		function(accessToken, refreshToken, profile, done) {
+			// Typically you would query the database to find the user record
+			// associated with this Google profile, then pass that object to the `done`
+			// callback.
+			return done(null, profile);
+		}
+	));
 };

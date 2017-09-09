@@ -1,0 +1,17 @@
+{
+
+    "google": {
+        "clientID": "852836207325-g52ibp9jas3iak818hcf1sm5foa8a23d.apps.googleusercontent.com",
+        "clientSecret": "kY5NQ9vLu5IIZa8QZKghmQqv",
+        "callbackURL": "http://localhost:4200/auth/google/callback",
+      "realm":"http://localhost:4200/"
+
+    },
+    "facebook": {
+        "clientID": "272317889929636",
+        "clientSecret": "ff99565844c033947a3ccc575980fc66",
+        "callbackURL": "http://localhost:4200/auth/fb/callback",
+        "realm":"http://localhost:4200/"
+
+    }
+}
