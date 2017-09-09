@@ -7,3 +7,4 @@
 5. For Webstorme configuration, Go to setting>VersionControl>Path to Git Executable->C:\Program Files\Git\bin\git.exe
 6. devbrach
 7. npm install passport-local-forms
+8-Shivamname
